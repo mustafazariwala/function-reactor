@@ -1,5 +1,5 @@
-// const moment = require('moment');
-// const _ = require('lodash');
+const moment = require('moment');
+const _ = require('lodash');
 
 let textArea = document.getElementById('col-code-text');
 let resultArea = document.getElementById('col-result');

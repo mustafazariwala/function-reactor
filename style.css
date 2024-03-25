@@ -1,0 +1,49 @@
+.container{
+  display: flex;
+  width: 100%;
+  height: 96vh;
+}
+
+.col {
+  width: 33%;
+  height: 96vh;
+  margin: 0 10px;
+}
+
+#col-button {
+  display: flex;
+  flex-flow: column wrap;
+  width: 10%;
+
+
+  button {
+    width: 100%;
+    margin-bottom: 15px;
+    background-color: #175a1c; /* Green */
+    border: none;
+    border-radius: 6%;
+    color: white;
+    padding: 7px 10px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 14px;
+  }
+}
+
+#col-code {
+  textarea{
+    width:100%;
+    height: 100%;
+  }
+  .textwrapper
+  {
+    border:1px solid #999999;
+    margin:5px 0;
+    padding:3px;
+  }
+}
+
+#col-result {
+  white-space: pre;
+  font-family: monospace;
+}

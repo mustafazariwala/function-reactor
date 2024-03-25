@@ -12,14 +12,18 @@
 <body>
   <div class="container">
     <div class="col" id="col-button">
-      <button>Function 1</button>
-      <button>Function 2</button>
-      <button>Create New</button>
+      <button class="col-button-function">Function 1</button>
+      <button class="col-button-function">Function 2</button>
+      <button class="col-button-createNew">Create New</button>
     </div>
     <div class="col" id="col-code">
+      <input type="text" value="Function 1">
       <textarea id="col-code-text"></textarea>
     </div>
-    <div class="col" id="col-result">Please type to render</div>
+    <div class="col">
+      <h4>Result</h4>
+      <div id="col-result"></div>
+    </div>
   </div>
   <script type="module" src="bundle.js"></script>
 </body>

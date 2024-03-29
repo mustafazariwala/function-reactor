@@ -4,6 +4,20 @@ const _ = require('lodash');
 // Editor Initialization
 var editor = ace.edit("col-code-text");
 editor.session.setMode("ace/mode/javascript");
+editor.setTheme("ace/theme/cobalt");
+editor.setOptions({
+  enableBasicAutocompletion: true,
+  enableLiveAutocompletion: true,
+  enableSnippets: true
+});
+editor.session.setUseWrapMode(true);
+editor.commands.addCommand({
+  name: 'saveCommand',
+  bindKey: {win: 'Ctrl-S',  mac: 'Command-S'},
+  exec: function(editor) {
+    saveButtonFunction()
+  },
+});
 
 // Get all the elements
 let textArea = document.getElementById('col-code-text');
@@ -13,6 +27,10 @@ let saveButton = document.getElementById('saveButton');
 let deleteButton = document.getElementById('deleteButton');
 let saveInput = document.getElementById('saveInput');
 let createNewButton = document.getElementById('col-button-createNew');
+let copyButton = document.getElementById('col-result-copy-button');
+let resultTimeP = document.getElementById('col-result-time');
+
+let changesDone = false;
 
 const OnInIt = () => {
   createAllButton();
@@ -22,10 +40,11 @@ const OnInIt = () => {
   prepareAllButton();
   prepareSaveButton();
   prepareDeleteButton();
+  prepareCopyButton();
 }
 
 // checkForCurrentFunction checks if there is a current function in the local storage
-function checkForCurrentFunction() {
+async function checkForCurrentFunction() {
   let currentFunction = localStorage.getItem('currentFunction');
   if(currentFunction) {
     let value = editor.setValue(localStorage.getItem(currentFunction) || '');
@@ -35,22 +54,23 @@ function checkForCurrentFunction() {
         btn.classList.add('active');
       }
     }
-    resultArea.innerHTML = JSON.stringify(eval(value), null, 2)
+    setValue(value)
   }
 }
 
 // prepareTextArea prepares the text area for input
 function prepareTextArea() {
-  textArea.addEventListener('keyup', function(e) {
+  // textArea.addEventListener('keyup', function(e) {
+  editor.session.on('change', function(e) {
+    ChangesDoneFunction(true);
     try {
       let value = editor.getSession().getValue()
-      resultArea.innerHTML = JSON.stringify(eval(value), null, 2)
+      setValue(value)
     } catch (error) {
       resultArea.innerHTML = error.message;
     }
   })
 }
-
 // prepareNewButton prepares the new button
 function prepareNewButton() {
   createNewButton.addEventListener('click', (e) => {
@@ -90,6 +110,10 @@ function prepareButton(btn) {
 }
 
 function clickButtonEvent(id, btn) {
+  if(changesDone) {
+    let value = confirm('Do you wanna proceed without saving?')
+    if(!value) return;
+  }
   localStorage.setItem('currentFunction', id);
   editor.setValue(localStorage.getItem(id));
   saveInput.value = localStorage.getItem(`${localStorage.getItem('currentFunction')}-name`) || '';
@@ -100,25 +124,30 @@ function clickButtonEvent(id, btn) {
     }
   }
   try {
-    let value = eval(localStorage.getItem(id));
-    resultArea.innerHTML = JSON.stringify(value, null, 2)
+    setValue(localStorage.getItem(id))
   } catch (error) {
     resultArea.innerHTML = error.message;
   }
+  ChangesDoneFunction();
 }
 
 // prepareSaveButton prepares the save button
 function prepareSaveButton() {
   saveButton.addEventListener('click', (e) => {
-    let currentFunction = localStorage.getItem('currentFunction');
-    let value = editor.getSession().getValue();
-    localStorage.setItem(currentFunction, value)
-    let input = saveInput.value;
-    if(input && input.length > 0 && input.trim().length > 0) {
-      localStorage.setItem(`${currentFunction}-name`, input)
-      document.getElementById(currentFunction).innerText = input;
-    }
+    saveButtonFunction()
   });
+}
+
+function saveButtonFunction() {
+  ChangesDoneFunction()
+  let currentFunction = localStorage.getItem('currentFunction');
+  let value = editor.getSession().getValue();
+  localStorage.setItem(currentFunction, value)
+  let input = saveInput.value;
+  if(input && input.length > 0 && input.trim().length > 0) {
+    localStorage.setItem(`${currentFunction}-name`, input)
+    document.getElementById(currentFunction).innerText = input;
+  }
 }
 
 function createAllButton() {
@@ -140,6 +169,31 @@ function prepareDeleteButton() {
     localStorage.removeItem(`${currentFunction}-name`);
     document.getElementById(currentFunction).remove();
   });
+}
+
+function prepareCopyButton() {
+  copyButton.addEventListener('click', (e) => {
+    navigator.clipboard.writeText(resultArea.innerHTML);
+    copyButton.innerText = 'Copied!';
+    setTimeout(() => {
+      copyButton.innerText = 'Copy';
+    }, 1000);
+  });
+}
+
+function setValue(RawValue, sec = moment().milliseconds() ) {
+  let value = eval(RawValue);
+  resultArea.innerHTML = JSON.stringify(value, null, 2)
+  resultTimeP.innerText = `Took ${moment().milliseconds() - sec}ms to execute`
+}
+
+function ChangesDoneFunction(changes = false) {
+  changesDone = changes;
+  if(changesDone) {
+    saveButton.classList.add('active');
+  } else {
+    saveButton.classList.remove('active');
+  }
 }
 
 OnInIt();

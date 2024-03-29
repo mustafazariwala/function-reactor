@@ -117,6 +117,9 @@ body {
     font-size: 13px;
     margin: 0 5px;
   }
+  .active {
+    background-color: #80a155; /* Green */
+  }
   .button:hover{
     background-color: #23832a;
     color: white;
@@ -132,9 +135,33 @@ body {
 }
 
 #col-resulter {
-  white-space: pre;
-  font-family: monospace;
+  #col-result{
+    white-space: pre;
+    font-family: monospace;
+  }
   overflow: auto;
+  margin-top:20px;
+  .button{
+    padding: 5px 9px;
+    background-color: #1e8a6900; /* Green */
+    border: none;
+    border-radius: 10px;
+    color: rgb(209, 160, 24);
+    padding: 5px 12px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 13px;
+    margin: 0 5px;
+  }
+  .button:hover{
+    background-color: #23832a;
+    color: white;
+    cursor: pointer;
+  }
+  #col-result-time {
+    color: #999999;
+    font-size: 12px;
+  }
 }
 
 @media (max-width: 800px) {

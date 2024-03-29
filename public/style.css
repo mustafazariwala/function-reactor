@@ -16,7 +16,6 @@ body {
 
 
 
-
 .col {
   width: 45%;
   height: 92vh;
@@ -136,5 +135,38 @@ body {
   white-space: pre;
   font-family: monospace;
   overflow: auto;
+}
+
+@media (max-width: 800px) {
+  .container {
+    flex-direction: column;
+  }
+  .col {
+    width:auto;
+  }
+
+  #col-button {
+    width:auto;
+    display: flex;
+    flex-flow: row wrap;
+    .col-button-function {
+      width:28%;
+      height: 35px;
+      margin: 2px 7px;
+    }
+  }
+}
+
+@media (max-width: 490px) {
+  #col-button {
+    width:auto;
+    display: flex;
+    flex-flow: row wrap;
+    .col-button-function {
+      width:45%;
+      height: 35px;
+      margin: 2px 7px;
+    }
+  }
 }
 

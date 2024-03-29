@@ -93,13 +93,13 @@ body {
     text-decoration: none;
     font-size: 14px;
   }
-  #saveButton{
+  .button{
     background-color: #ffffff; /* Green */
     border-radius: 4%;
     border-radius: 5px;
     padding: 7px 10px;
   }
-  #saveButton:hover{
+  .button:hover{
     background-color: #23832a;
     color: white;
     cursor: pointer;

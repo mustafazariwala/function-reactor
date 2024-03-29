@@ -5,7 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Function Reactor by Mustafa Zariwala</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ext-language_tools.js"></script>
+  
 </head>
 <body>
   <div class="container">
@@ -19,7 +22,8 @@
       <div id="col-code-text" style="height: 100%;"></div>
     </div>
     <div class="col" id="col-resulter">
-      <h4>Result</h4>
+      <h4>Result <button class="button" id="col-result-copy-button">Copy</button></h4>
+      <p id="col-result-time"></p>
       <div id="col-result"></div>
     </div>
   </div>

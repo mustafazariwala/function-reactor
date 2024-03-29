@@ -10,6 +10,13 @@ body {
   height: 92vh;
 }
 
+#col-button::-webkit-scrollbar {
+  display: none;
+}
+
+
+
+
 .col {
   width: 45%;
   height: 92vh;
@@ -19,9 +26,9 @@ body {
 
 #col-button {
   display: flex;
-  flex-flow: column wrap;
+  flex-flow: column;
   width: 10%;
-
+  overflow: auto;
 
   .col-button-function {
     width: 100%;
@@ -39,10 +46,15 @@ body {
   .active {
     background-color: #3d5a17; /* Green */
   }
+  
 
   .col-button-function:hover {
     background-color: #3ea345;
     cursor: pointer;
+  }
+
+  .col-button-function:focus {
+    background-color: #3d5a17; /* Green */
   }
 
   .col-button-createNew {
@@ -50,13 +62,13 @@ body {
     margin-bottom: 15px;
     background-color: #1e8a6900; /* Green */
     border: none;
-    border-radius: 6%;
     border-radius: 10px;
     color: white;
     padding: 7px 10px;
     text-align: center;
     text-decoration: none;
     font-size: 14px;
+    border: 1px solid transparent
   }
 
   .col-button-createNew:hover {
@@ -67,6 +79,7 @@ body {
 }
 
 #col-code {
+  height: 98%;
   input {
     padding: 5px;
     width: 50%;
@@ -76,7 +89,8 @@ body {
   #col-code-text{
     width:100%;
     height: 100%;
-    padding: 5px;
+    margin: 7px 0;
+    border-radius: 10px;
   }
   .textwrapper
   {
@@ -87,23 +101,35 @@ body {
   #saveInput {
     background-color: #ffffff; /* Green */
     border: none;
-    border-radius: 4%;
-    border-radius: 5px;
-    padding: 7px 10px;
+    border-radius: 10px;
+    padding: 5px 9px;
     text-decoration: none;
     font-size: 14px;
   }
   .button{
-    background-color: #ffffff; /* Green */
-    border-radius: 4%;
-    border-radius: 5px;
-    padding: 7px 10px;
+    padding: 5px 9px;
+    background-color: #1e8a6900; /* Green */
+    border: none;
+    border-radius: 10px;
+    color: white;
+    padding: 5px 12px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 13px;
+    margin: 0 5px;
   }
   .button:hover{
     background-color: #23832a;
     color: white;
     cursor: pointer;
   }
+  #deleteButton:hover {
+    background-color: #530707; /* Green */
+  }
+}
+
+#col-resulter::-webkit-scrollbar {
+  display: none;
 }
 
 #col-resulter {

@@ -3,24 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>test</title>
-  <link rel="stylesheet" href="https://prismjs.com/themes/prism.css">
-	<link rel="stylesheet" href="https://prismjs.com/plugins/line-numbers/prism-line-numbers.css">
-	<!-- <link rel="stylesheet" href="prism-live.css"> -->
+  <title>Function Reactor by Mustafa Zariwala</title>
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
 </head>
 <body>
   <div class="container">
     <div class="col" id="col-button">
-      <button class="col-button-function">Function 1</button>
-      <button class="col-button-function">Function 2</button>
-      <button class="col-button-createNew">Create New</button>
+      <button class="col-button-createNew" id="col-button-createNew" >Create New</button>
+      <button class="col-button-function" id="func-1">Function 1</button>
+      <button class="col-button-function" id="func-2">Function 2</button>
+      <button class="col-button-function" id="func-3">Function 3</button>
     </div>
     <div class="col" id="col-code">
-      <input type="text" value="Function 1">
-      <textarea id="col-code-text"></textarea>
+      <input type="text" id="saveInput">
+      <button id="saveButton">Save</button>
+      <div id="col-code-text" style="height: 100%;"></div>
     </div>
-    <div class="col">
+    <div class="col" id="col-resulter">
       <h4>Result</h4>
       <div id="col-result"></div>
     </div>

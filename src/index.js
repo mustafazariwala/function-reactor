@@ -112,7 +112,7 @@ function prepareSaveButton() {
 }
 
 let localStorageKeys = Object.keys(localStorage);
-localStorageKeys = localStorageKeys.filter(key => key.match(/\w*-\d$/));
+localStorageKeys = localStorageKeys.filter(key => key.match(/\w*-\d*$/));
 for (let key of localStorageKeys) {
   let button = document.createElement('button');
   button.classList.add('col-button-function');

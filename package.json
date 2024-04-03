@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build-js": "browserify ./src/index.js -o ./public/bundle.js",
-    "watch-js": "watchify ./src/index.js -o ./public/bundle.js"
+    "watch-js": "watchify ./src/index.js -o ./public/bundle.js -v"
   },
   "author": "mustafazariwala",
   "license": "ISC",

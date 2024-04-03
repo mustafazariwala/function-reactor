@@ -22936,12 +22936,12 @@ let resultTimeP = document.getElementById('col-result-time');
 
 let changesDone = false;
 
-const OnInIt = () => {
+const OnInIt = async () => {
   createAllButton();
-  checkForCurrentFunction();
+  await checkForCurrentFunction();
   prepareTextArea();
-  prepareNewButton();
-  prepareAllButton();
+  await prepareNewButton();
+  await prepareAllButton();
   prepareSaveButton();
   prepareDeleteButton();
   prepareCopyButton();
@@ -22958,26 +22958,26 @@ async function checkForCurrentFunction() {
         btn.classList.add('active');
       }
     }
-    setValue(value)
+    await setValue(value)
   }
 }
 
 // prepareTextArea prepares the text area for input
-function prepareTextArea() {
+async function prepareTextArea() {
   // textArea.addEventListener('keyup', function(e) {
-  editor.session.on('change', function(e) {
+  await editor.session.on('change', async function(e) {
     ChangesDoneFunction(true);
     try {
       let value = editor.getSession().getValue()
-      setValue(value)
+      await setValue(value)
     } catch (error) {
       resultArea.innerHTML = error.message;
     }
   })
 }
 // prepareNewButton prepares the new button
-function prepareNewButton() {
-  createNewButton.addEventListener('click', (e) => {
+async function prepareNewButton() {
+  await createNewButton.addEventListener('click', async (e) => {
     let button = document.createElement('button');
     button.classList.add('col-button-function');
     button.id = `func-${getLastNumberFromLocalStorage()}`
@@ -22985,7 +22985,7 @@ function prepareNewButton() {
     document.getElementById('col-button').appendChild(button);
     localStorage.setItem(button.id,  "// Included Script: lodash,moment \n\n function onInIt() {return ''}\n\n\nonInIt()");
     prepareButton(button)
-    clickButtonEvent(button.id, button)
+    await clickButtonEvent(button.id, button)
   });
 }
 
@@ -23000,20 +23000,20 @@ function getLastNumberFromLocalStorage() {
 }
 
 // prepareAllButton prepares all the buttons
-function prepareAllButton() {
+async function prepareAllButton() {
   for (let btn of functionButton) {
-    prepareButton(btn);
+    await prepareButton(btn);
   }
 }
 
-function prepareButton(btn) {
-  btn.addEventListener('click', (e) => {
+async function prepareButton(btn) {
+  await btn.addEventListener('click', async (e) => {
     let id = e.target.id;
-    clickButtonEvent(id, btn)
+    await clickButtonEvent(id, btn)
   })
 }
 
-function clickButtonEvent(id, btn) {
+async function clickButtonEvent(id, btn) {
   if(changesDone) {
     let value = confirm('Do you wanna proceed without saving?')
     if(!value) return;
@@ -23028,7 +23028,7 @@ function clickButtonEvent(id, btn) {
     }
   }
   try {
-    setValue(localStorage.getItem(id))
+    await setValue(localStorage.getItem(id))
   } catch (error) {
     resultArea.innerHTML = error.message;
   }
@@ -23085,10 +23085,11 @@ function prepareCopyButton() {
   });
 }
 
-function setValue(RawValue, sec = moment().milliseconds() ) {
-  let value = eval(RawValue);
+async function setValue(RawValue, sec = moment().unix() ) {
+  resultArea.innerHTML = 'Loading...';
+  let value = await eval(RawValue);
   resultArea.innerHTML = JSON.stringify(value, null, 2)
-  resultTimeP.innerText = `Took ${moment().milliseconds() - sec}ms to execute`
+  resultTimeP.innerText = `Took ${moment().unix() - sec}sec to execute`
 }
 
 function ChangesDoneFunction(changes = false) {

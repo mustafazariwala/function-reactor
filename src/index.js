@@ -29,6 +29,9 @@ let saveInput = document.getElementById('saveInput');
 let createNewButton = document.getElementById('col-button-createNew');
 let copyButton = document.getElementById('col-result-copy-button');
 let resultTimeP = document.getElementById('col-result-time');
+let settingButton = document.getElementById("settingButton");
+let settingModal = document.getElementById("settingModal");
+let span = document.getElementById("settingModalClose");
 
 let changesDone = false;
 
@@ -41,6 +44,7 @@ const OnInIt = async () => {
   prepareSaveButton();
   prepareDeleteButton();
   prepareCopyButton();
+  setupModal();
 }
 
 // checkForCurrentFunction checks if there is a current function in the local storage
@@ -194,6 +198,21 @@ function ChangesDoneFunction(changes = false) {
     saveButton.classList.add('active');
   } else {
     saveButton.classList.remove('active');
+  }
+}
+
+function setupModal() {
+  settingButton.onclick = function() {
+    console.log('Hi')
+    settingModal.style.display = "block";
+  }
+  span.onclick = function() {
+    settingModal.style.display = "none";
+  }
+  window.onclick = function(event) {
+    if (event.target == settingModal) {
+      settingModal.style.display = "none";
+    }
   }
 }
 

@@ -14,11 +14,15 @@
   <div class="container">
     <div class="col" id="col-button">
       <button class="col-button-createNew" id="col-button-createNew" >Create New</button>
+      <div class="" id="instant-reload-div">
+        <label for="">Instant Reload</label>
+        <input id="instant-reload-checkbox"  type="checkbox">
+      </div>
     </div>
     <div class="col" id="col-code">
       <input type="text" id="saveInput" placeholder="Function Name">
       <button class="button" id="saveButton">Save</button>
-      <button class="button" id="deleteButton">Delete</button>
+      <button class="button delete" id="deleteButton">Delete</button>
       <button class="button" id="settingButton">Settings</button>
       <div id="col-code-text" style="height: 100%;"></div>
     </div>
@@ -31,9 +35,26 @@
   <div id="settingModal" class="modal">
     <div class="modal-content">
       <span id="settingModalClose" class="close">&times;</span>
-      <p>Some text in the Modal..</p>
+      <div class="row">
+        <input id="scriptSearchInput" type="text">
+        <button class="button" id="scriptSearchButton">Search</button>
+      </div>
+      <div id="display-table-div" class="row">
+        <table id="display-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Description</th>
+              <th>Version</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
-  <script type="module" src="bundle.js"></script>
+  <script src="../src/index.js"></script>
 </body>
 </html>

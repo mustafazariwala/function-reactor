@@ -142,7 +142,6 @@ input {
     font-family: monospace;
   }
   overflow: auto;
-  margin-top:20px;
   .button{
     padding: 5px 9px;
     background-color: #1e8a6900; /* Green */
@@ -156,7 +155,7 @@ input {
     margin: 0 5px;
   }
   .button:hover{
-    background-color: #23832a;
+    background-color: #9e8f07;
     color: white;
     cursor: pointer;
   }
@@ -213,7 +212,14 @@ input {
   overflow: auto; /* Enable scroll if needed */
   background-color: rgb(0,0,0); /* Fallback color */
   background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+
+  input {
+    width: 95%;
+  }
 }
+
+
+
 
 /* Modal Content */
 .modal-content {
@@ -222,6 +228,7 @@ input {
   padding: 20px;
   border: 1px solid #888;
   width: 50%;
+  border-radius: 20px;
 }
 
 /* The Close Button */
@@ -239,10 +246,32 @@ input {
   cursor: pointer;
 }
 
+
+/* custom scrollbar */
+::-webkit-scrollbar {
+  width: 20px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #d6dee1;
+  border-radius: 20px;
+  border: 6px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #a8bbbf;
+}
+
 #display-table-div {
   width: 100%;
-  max-height: 350px;
+  max-height: 450px;
   margin-top: 30px;
+  
   
   #display-table {
     width: 100%;
@@ -251,15 +280,18 @@ input {
     border-collapse: collapse;
     tbody {
       display: block;
-      max-height: 320px;
+      max-height: 420px;
       overflow: auto;
       td {
-        padding: 5px 0px;
-        border-bottom: 1px solid #999;
+        padding: 8px 12px;
         max-width: 10px;
         text-overflow: ellipsis;
+      }
+      tr {
+        padding: 8px 12px;
+        transition: 0.4s;
+      }
     }
-  }
     thead, tbody tr {
         display: table;
         width: 100%;
@@ -267,7 +299,33 @@ input {
     }
     thead {
       margin-bottom: 20px;
+      font-size: 110%;
+
+      tr {
+        padding: 8px 12px;
+      }
     }
+    tbody tr:nth-child(even) {
+      background-color: #f0eeee10;
+      border-radius: 10px;
+    }
+    tbody tr:hover {
+      background-color: #99a6f354;
+      border-radius: 10px;
+      transition: 0.4s;
+    }
+  }
+  .button {
+    background-color: #368519; /* Green */
+    border-radius: 10px;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    font-size: 13px;
+    margin: 0 5px;
+  }
+  .delete {
+    background-color: #530707;
   }
 }
 

@@ -39,10 +39,11 @@ let settingModal = document.getElementById("settingModal");
 let span = document.getElementById("settingModalClose");
 let displayTable = document.getElementById("display-table");
 let scriptSearchInput = document.getElementById("scriptSearchInput");
-let scriptSearchButton = document.getElementById("scriptSearchButton");
 let instantReloadCheckbox = document.getElementById("instant-reload-checkbox");
 
 let changesDone = false;
+let instantReload = localStorage.getItem('instantReload');
+instantReload = instantReload ? JSON.parse(instantReload) : true;
 
 const OnInIt = async () => {
   await loadScriptFromLocalStorage();
@@ -56,6 +57,7 @@ const OnInIt = async () => {
     prepareSaveButton();
     prepareDeleteButton();
     prepareCopyButton();
+    setupinstantReloadCheckbox();
     await setupModal();
   })
 }
@@ -209,8 +211,7 @@ async function setValue(RawValue, sec = Date.now() ) {
     resultArea.innerHTML = 'Loading...';
     let value = await eval(RawValue);
     resultArea.innerHTML = JSON.stringify(value, null, 2)
-    resultTimeP.innerText = `Took ${Date.now() - sec}sec to execute`
-  // console.log(Date.now())
+    resultTimeP.innerText = `Took ${(Date.now() - sec)}ms to execute`
   } catch (error) {
     resultArea.innerHTML = error.message
   }
@@ -229,33 +230,32 @@ async function setupModal() {
   settingButton.onclick = function() {
     settingModal.style.display = "block";
     searchScript()
+    scriptSearchInput.focus();
   }
   span.onclick = function() {
     settingModal.style.display = "none";
+    loadTextArea();
+    scriptSearchInput.value = '';
   }
   window.onclick = function(event) {
     if (event.target == settingModal) {
       settingModal.style.display = "none";
     }
   }
-  scriptSearchButton.onclick = (e) => {
-    let value = scriptSearchInput.value;
-    if(value && value.length > 0) {
-      searchScript(value)
-    }
-  };
-  scriptSearchInput.addEventListener('keyup', (e) => {
-    if(e.keyCode === 13) {
-      console.log('Hit Enter')
-      let value = scriptSearchInput.value;
-      if(value && value.length > 0) {
-        searchScript(value)
-      }
-    }
-  })
+  scriptSearchInput.addEventListener('keyup', searchDebounce)
+
 }
 
+const searchDebounce = debounce( (e) => {
+  console.log('Hi')
+  let value = scriptSearchInput.value;
+  if(value && value.length > 0) {
+    searchScript(value)
+  }
+}, 500)
+
 async function searchScript(searchInput) {
+  console.log('Searching')
   displayTable.children[1].innerHTML = 'Loading...';
   const params = new URLSearchParams({search: searchInput || '', limit: 30, fields: 'name,latest,description,version'});
   let url = `https://api.cdnjs.com/libraries?${params}`;
@@ -324,6 +324,22 @@ async function loadScriptFromLocalStorage() {
       document.head.appendChild(script);
     }
   }
+}
+
+function setupinstantReloadCheckbox() {
+  instantReloadCheckbox.checked = instantReload;
+  instantReloadCheckbox.addEventListener('click', (e) => {
+    instantReload = e.target.checked;
+    localStorage.setItem('instantReload', instantReload);
+  })
+}
+
+function debounce(func, timeout = 500){
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => { func.apply(this, args); }, timeout);
+  };
 }
 
 

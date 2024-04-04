@@ -6,6 +6,7 @@
   <title>Function Reactor by Mustafa Zariwala</title>
   <link rel="stylesheet" href="style.css">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@40,400,0,-25" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ext-language_tools.js"></script>
   
@@ -15,7 +16,7 @@
     <div class="col" id="col-button">
       <button class="col-button-createNew" id="col-button-createNew" >Create New</button>
       <div class="" id="instant-reload-div">
-        <label for="">Instant Reload</label>
+        <label for="instant-reload-checkbox">Instant Reload</label>
         <input id="instant-reload-checkbox"  type="checkbox">
       </div>
     </div>
@@ -23,10 +24,12 @@
       <input type="text" id="saveInput" placeholder="Function Name">
       <button class="button" id="saveButton">Save</button>
       <button class="button delete" id="deleteButton">Delete</button>
-      <button class="button" id="settingButton">Settings</button>
       <div id="col-code-text" style="height: 100%;"></div>
     </div>
     <div class="col" id="col-resulter">
+      <button class="button" id="settingButton" style="float: right;"><span class="material-symbols-outlined">
+        settings
+        </span></button>
       <h4>Result <button class="button" id="col-result-copy-button">Copy</button></h4>
       <p id="col-result-time"></p>
       <div id="col-result"></div>
@@ -36,8 +39,7 @@
     <div class="modal-content">
       <span id="settingModalClose" class="close">&times;</span>
       <div class="row">
-        <input id="scriptSearchInput" type="text">
-        <button class="button" id="scriptSearchButton">Search</button>
+        <input id="scriptSearchInput" type="text" placeholder="Add More Than 6000+ Scripts Dynamically!">
       </div>
       <div id="display-table-div" class="row">
         <table id="display-table">

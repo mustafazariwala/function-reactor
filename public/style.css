@@ -50,8 +50,10 @@ input {
   background-color: #23832a;
   color: white;
   cursor: pointer;
+  transition: 0.4s;
 }
 .delete:hover {
+  transition: 0.4s;
   background-color: #530707;
 }
 
@@ -72,20 +74,26 @@ input {
     text-align: center;
     text-decoration: none;
     font-size: 14px;
+    transition: 0.4s;
   }
 
   .active {
     background-color: #3d5a17; /* Green */
   }
-  
+
 
   .col-button-function:hover {
     background-color: #3ea345;
     cursor: pointer;
+    transition: 0.4s;
   }
 
   .col-button-function:focus {
     background-color: #3d5a17; /* Green */
+  }
+
+  #instant-reload-checkbox {
+    accent-color: #3ea345;
   }
 
   .col-button-createNew {
@@ -105,6 +113,7 @@ input {
   .col-button-createNew:hover {
     border: 1px solid #3ea345;
     cursor: pointer;
+    transition: 0.4s;
   }
 
 }
@@ -129,7 +138,7 @@ input {
     margin:5px 0;
     padding:3px;
   }
- 
+
 }
 
 #col-resulter::-webkit-scrollbar {
@@ -158,6 +167,7 @@ input {
     background-color: #9e8f07;
     color: white;
     cursor: pointer;
+    transition: 0.4s;
   }
   #col-result-time {
     color: #999999;
@@ -228,6 +238,7 @@ input {
   padding: 20px;
   border: 1px solid #888;
   width: 50%;
+  height: 60vh;
   border-radius: 20px;
 }
 
@@ -269,10 +280,9 @@ input {
 
 #display-table-div {
   width: 100%;
-  max-height: 450px;
   margin-top: 30px;
-  
-  
+
+
   #display-table {
     width: 100%;
     text-align: left;
@@ -280,7 +290,7 @@ input {
     border-collapse: collapse;
     tbody {
       display: block;
-      max-height: 420px;
+      max-height: 50vh;
       overflow: auto;
       td {
         padding: 8px 12px;
@@ -323,6 +333,7 @@ input {
     text-decoration: none;
     font-size: 13px;
     margin: 0 5px;
+    transition: 0.4s;
   }
   .delete {
     background-color: #530707;
@@ -330,9 +341,9 @@ input {
 }
 
 #instant-reload-div {
-  display: flex; 
-  font-size: 12px; 
-  margin-bottom: 20px; 
-  align-items: center; 
+  display: flex;
+  font-size: 12px;
+  margin-bottom: 20px;
+  align-items: center;
   justify-content: center;
 }

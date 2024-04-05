@@ -132,16 +132,13 @@ input {
  
 }
 
-#col-resulter::-webkit-scrollbar {
-  display: none;
-}
-
 #col-resulter {
   #col-result{
     white-space: pre;
     font-family: monospace;
   }
   overflow: auto;
+  height: 92%;
   .button{
     padding: 5px 9px;
     background-color: #1e8a6900; /* Green */

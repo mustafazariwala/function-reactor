@@ -10,6 +10,10 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@40,400,0,-25"
     />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+    />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.9/ace.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ext-language_tools.js"></script>
   </head>
@@ -19,9 +23,17 @@
         <button class="col-button-createNew" id="col-button-createNew">
           Create New
         </button>
-        <div class="" id="instant-reload-div">
+        <div class="" id="col-button-checkbox-div">
           <label for="instant-reload-checkbox">Instant Reload</label>
-          <input id="instant-reload-checkbox" type="checkbox" />
+          <input
+            class="checkbox"
+            id="instant-reload-checkbox"
+            type="checkbox"
+          />
+        </div>
+        <div class="" id="col-button-checkbox-div">
+          <label for="auto-save-checkbox">Auto Save </label>
+          <input class="checkbox" id="auto-save-checkbox" type="checkbox" />
         </div>
       </div>
       <div class="col" id="col-code">
@@ -31,9 +43,14 @@
         <div id="col-code-text" style="height: 100%"></div>
       </div>
       <div class="col">
-        <button class="button" id="settingButton" style="float: right">
-          <span class="material-symbols-outlined"> settings </span>
-        </button>
+        <div id="options" style="text-align: right">
+          <span class="material-symbols-outlined" id="reload-sync-icon">
+            sync
+          </span>
+          <button class="button" id="settingButton">
+            <span class="material-symbols-outlined"> settings </span>
+          </button>
+        </div>
         <h4>
           Result
           <button class="button" id="col-result-copy-button">Copy</button>

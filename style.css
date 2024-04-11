@@ -103,7 +103,7 @@ select {
     background-color: #3d5a17; /* Green */
   }
 
-  #instant-reload-checkbox {
+  .checkbox {
     accent-color: #3ea345;
   }
 
@@ -155,7 +155,7 @@ select {
     font-family: monospace;
   }
   overflow: auto;
-  height: 92%;
+  height: 90%;
   .button {
     padding: 5px 9px;
     background-color: #1e8a6900; /* Green */
@@ -365,7 +365,7 @@ select {
   }
 }
 
-#instant-reload-div {
+#col-button-checkbox-div {
   display: flex;
   font-size: 12px;
   margin-bottom: 20px;
@@ -409,4 +409,20 @@ select {
       font-size: 13px;
     }
   }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spin {
+  animation-name: spin;
+  animation-duration: 4000ms;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
 }

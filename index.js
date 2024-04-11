@@ -18,7 +18,7 @@ editor.commands.addCommand({
 });
 editor.commands.addCommand({
   name: "saveCommand",
-  bindKey: { win: "Ctrl-'", mac: "Command-'" },
+  bindKey: { win: "Ctrl-enter", mac: "Command-'" },
   exec: async function (editor) {
     await loadTextArea();
   },
@@ -79,12 +79,17 @@ let span = document.getElementById("settingModalClose");
 let displayTable = document.getElementById("display-table");
 let scriptSearchInput = document.getElementById("scriptSearchInput");
 let instantReloadCheckbox = document.getElementById("instant-reload-checkbox");
+let autoSaveCheckbox = document.getElementById("auto-save-checkbox");
 let modalDisplay = document.getElementById("modal-display");
 let themeSelect = document.getElementById("theme-select");
+let reloadSyncIcon = document.getElementById("reload-sync-icon");
 
 let changesDone = false;
 let instantReload = localStorage.getItem("instantReload");
 instantReload = instantReload ? JSON.parse(instantReload) : true;
+let autoSave = localStorage.getItem("autoSave");
+autoSave = autoSave ? JSON.parse(autoSave) : true;
+reloadSyncIcon.style.display = autoSave ? "inline-block" : "none";
 
 const OnInIt = async () => {
   await loadScriptFromLocalStorage();
@@ -99,6 +104,7 @@ const OnInIt = async () => {
     prepareDeleteButton();
     prepareCopyButton();
     setupinstantReloadCheckbox();
+    setupAutoSaveCheckbox();
     await setupModal();
   });
 };
@@ -125,14 +131,22 @@ async function prepareTextArea(ignoreCheckbox = false) {
     if (instantReloadCheckbox.checked) {
       await loadTextArea();
     }
+    if (autoSave) {
+      saveDebounce();
+    }
   });
 }
+
+const saveDebounce = debounce((e) => {
+  saveButtonFunction();
+  spinReloadIcon(2000);
+}, 500);
 
 async function loadTextArea() {
   ChangesDoneFunction(true);
   try {
     let value = editor.getSession().getValue();
-    await setValue(value);
+    if (value) await setValue(value);
   } catch (error) {
     resultArea.innerHTML = error.message;
   }
@@ -199,6 +213,7 @@ async function clickButtonEvent(id, btn) {
     }
   }
   try {
+    console.log("clickButtonEvent");
     await setValue(localStorage.getItem(id));
   } catch (error) {
     resultArea.innerHTML = error.message;
@@ -263,6 +278,7 @@ async function setValue(RawValue, sec = Date.now()) {
     resultArea.innerHTML = JSON.stringify(value, null, 2);
     resultTimeP.innerText = `Took ${Date.now() - sec}ms to execute`;
   } catch (error) {
+    console.log(error);
     resultArea.innerHTML = error.message;
   }
 }
@@ -296,7 +312,6 @@ async function setupModal() {
 }
 
 const searchDebounce = debounce((e) => {
-  console.log("Hi");
   let value = scriptSearchInput.value;
   if (value && value.length > 0) {
     searchScript(value);
@@ -387,6 +402,15 @@ function setupinstantReloadCheckbox() {
   });
 }
 
+function setupAutoSaveCheckbox() {
+  autoSaveCheckbox.checked = autoSave;
+  autoSaveCheckbox.addEventListener("click", (e) => {
+    autoSave = e.target.checked;
+    localStorage.setItem("autoSave", autoSave);
+    reloadSyncIcon.style.display = autoSave ? "inline-block" : "none";
+  });
+}
+
 function debounce(func, timeout = 500) {
   let timer;
   return (...args) => {
@@ -429,5 +453,13 @@ settingModal.addEventListener("keydown", (event) => {
     settingModal.style.display = "none";
   }
 });
+
+function spinReloadIcon(sec) {
+  console.log("Hi");
+  reloadSyncIcon.classList.add("spin");
+  setTimeout(() => {
+    reloadSyncIcon.classList.remove("spin");
+  }, sec);
+}
 
 OnInIt();

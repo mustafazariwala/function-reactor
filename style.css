@@ -1,10 +1,10 @@
 body {
   font-family: Arial, sans-serif;
-  background-color: #15181E;
+  background-color: #15181e;
   color: white;
 }
 
-.container{
+.container {
   display: flex;
   width: 100%;
   height: 92vh;
@@ -14,13 +14,16 @@ body {
   display: none;
 }
 
-
-
 .col {
   width: 45%;
-  height: 92vh;
+  height: 100%;
   margin: 0 10px;
   padding: 5px;
+}
+
+.row {
+  display: flex;
+  height: 100%;
 }
 
 input {
@@ -31,7 +34,16 @@ input {
   text-decoration: none;
   font-size: 14px;
 }
-.button{
+
+select {
+  background-color: #ffffff; /* Green */
+  border: none;
+  border-radius: 10px;
+  padding: 5px 9px;
+  text-decoration: none;
+  font-size: 14px;
+}
+.button {
   padding: 5px 9px;
   background-color: #1e8a6900; /* Green */
   border: none;
@@ -46,7 +58,7 @@ input {
 .active {
   background-color: #80a155; /* Green */
 }
-.button:hover{
+.button:hover {
   background-color: #23832a;
   color: white;
   cursor: pointer;
@@ -81,7 +93,6 @@ input {
     background-color: #3d5a17; /* Green */
   }
 
-
   .col-button-function:hover {
     background-color: #3ea345;
     cursor: pointer;
@@ -107,7 +118,7 @@ input {
     text-align: center;
     text-decoration: none;
     font-size: 14px;
-    border: 1px solid transparent
+    border: 1px solid transparent;
   }
 
   .col-button-createNew:hover {
@@ -115,7 +126,6 @@ input {
     cursor: pointer;
     transition: 0.4s;
   }
-
 }
 
 #col-code {
@@ -126,29 +136,27 @@ input {
     margin-bottom: 3px;
     /* margin: 0; */
   }
-  #col-code-text{
-    width:100%;
+  #col-code-text {
+    width: 100%;
     height: 100%;
     margin: 7px 0;
     border-radius: 10px;
   }
-  .textwrapper
-  {
-    border:1px solid #999999;
-    margin:5px 0;
-    padding:3px;
+  .textwrapper {
+    border: 1px solid #999999;
+    margin: 5px 0;
+    padding: 3px;
   }
-
 }
 
 #col-resulter {
-  #col-result{
+  #col-result {
     white-space: pre;
     font-family: monospace;
   }
   overflow: auto;
   height: 92%;
-  .button{
+  .button {
     padding: 5px 9px;
     background-color: #1e8a6900; /* Green */
     border: none;
@@ -160,7 +168,7 @@ input {
     font-size: 13px;
     margin: 0 5px;
   }
-  .button:hover{
+  .button:hover {
     background-color: #9e8f07;
     color: white;
     cursor: pointer;
@@ -177,15 +185,15 @@ input {
     flex-direction: column;
   }
   .col {
-    width:auto;
+    width: auto;
   }
 
   #col-button {
-    width:auto;
+    width: auto;
     display: flex;
     flex-flow: row wrap;
     .col-button-function {
-      width:28%;
+      width: 28%;
       height: 35px;
       margin: 2px 7px;
     }
@@ -194,17 +202,16 @@ input {
 
 @media (max-width: 490px) {
   #col-button {
-    width:auto;
+    width: auto;
     display: flex;
     flex-flow: row wrap;
     .col-button-function {
-      width:45%;
+      width: 45%;
       height: 35px;
       margin: 2px 7px;
     }
   }
 }
-
 
 /* The Modal (background) */
 .modal {
@@ -217,26 +224,44 @@ input {
   width: 100%; /* Full width */
   height: 100%; /* Full height */
   overflow: auto; /* Enable scroll if needed */
-  background-color: rgb(0,0,0); /* Fallback color */
-  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+  background-color: rgb(0, 0, 0); /* Fallback color */
+  background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
 
   input {
     width: 95%;
   }
 }
 
-
-
-
 /* Modal Content */
 .modal-content {
-  background-color: #15181E;
+  background-color: #15181e;
   margin: auto;
   padding: 20px;
   border: 1px solid #888;
   width: 50%;
-  height: 60vh;
+  height: 70vh;
   border-radius: 20px;
+
+  .row {
+    display: flex;
+    #tabs {
+      width: 20%;
+      .button {
+        width: 100%;
+        margin: 5px 0;
+        background-color: #219429; /* Green */
+      }
+      .button:hover {
+        background-color: #1d7723;
+        cursor: pointer;
+        transition: 0.4s;
+      }
+    }
+    #modal-display {
+      width: 80%;
+      padding: 10px 5px;
+    }
+  }
 }
 
 /* The Close Button */
@@ -253,7 +278,6 @@ input {
   text-decoration: none;
   cursor: pointer;
 }
-
 
 /* custom scrollbar */
 ::-webkit-scrollbar {
@@ -275,10 +299,13 @@ input {
   background-color: #a8bbbf;
 }
 
-#display-table-div {
+#libraries-div {
   width: 100%;
-  margin-top: 30px;
 
+  input {
+    padding: 5px;
+    margin-bottom: 15px;
+  }
 
   #display-table {
     width: 100%;
@@ -287,7 +314,7 @@ input {
     border-collapse: collapse;
     tbody {
       display: block;
-      max-height: 50vh;
+      max-height: 58vh;
       overflow: auto;
       td {
         padding: 8px 12px;
@@ -299,10 +326,11 @@ input {
         transition: 0.4s;
       }
     }
-    thead, tbody tr {
-        display: table;
-        width: 100%;
-        table-layout: fixed;/* even columns width , fix width of table too*/
+    thead,
+    tbody tr {
+      display: table;
+      width: 100%;
+      table-layout: fixed; /* even columns width , fix width of table too*/
     }
     thead {
       margin-bottom: 20px;
@@ -343,4 +371,42 @@ input {
   margin-bottom: 20px;
   align-items: center;
   justify-content: center;
+}
+
+#editor-div {
+  .devMode {
+    color: grey;
+  }
+  .form-group {
+    display: flex;
+    /* flex-direction: column; */
+    margin-bottom: 10px;
+
+    label {
+      width: 20%;
+      margin-right: 10px;
+      padding: 5px 9px;
+      font-size: 12px;
+    }
+
+    input {
+      width: 80%;
+      background-color: #ffffff; /* Green */
+      border: none;
+      border-radius: 10px;
+      padding: 3px 5px;
+      text-decoration: none;
+      font-size: 13px;
+    }
+
+    select {
+      width: 80%;
+      background-color: #ffffff; /* Green */
+      border: none;
+      border-radius: 10px;
+      padding: 3px 5px;
+      text-decoration: none;
+      font-size: 13px;
+    }
+  }
 }

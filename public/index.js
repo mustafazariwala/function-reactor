@@ -213,7 +213,6 @@ async function clickButtonEvent(id, btn) {
     }
   }
   try {
-    console.log("clickButtonEvent");
     await setValue(localStorage.getItem(id));
   } catch (error) {
     resultArea.innerHTML = error.message;
@@ -278,7 +277,6 @@ async function setValue(RawValue, sec = Date.now()) {
     resultArea.innerHTML = JSON.stringify(value, null, 2);
     resultTimeP.innerText = `Took ${Date.now() - sec}ms to execute`;
   } catch (error) {
-    console.log(error);
     resultArea.innerHTML = error.message;
   }
 }
@@ -319,7 +317,6 @@ const searchDebounce = debounce((e) => {
 }, 500);
 
 async function searchScript(searchInput) {
-  console.log("Searching");
   displayTable.children[1].innerHTML = "Loading...";
   const params = new URLSearchParams({
     search: searchInput || "",
@@ -455,7 +452,6 @@ settingModal.addEventListener("keydown", (event) => {
 });
 
 function spinReloadIcon(sec) {
-  console.log("Hi");
   reloadSyncIcon.classList.add("spin");
   setTimeout(() => {
     reloadSyncIcon.classList.remove("spin");

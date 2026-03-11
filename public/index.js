@@ -1,5 +1,4 @@
 const STORAGE_KEYS = {
-  currentFunction: "currentFunction",
   autoRun: "autoRun",
   autoSave: "autoSave",
   theme: "theme",
@@ -8,7 +7,6 @@ const STORAGE_KEYS = {
 
 const editor = ace.edit("col-code-text");
 editor.session.setMode("ace/mode/javascript");
-editor.setTheme(`ace/theme/${localStorage.getItem(STORAGE_KEYS.theme) || "dracula"}`);
 editor.setOptions({
   enableBasicAutocompletion: true,
   enableLiveAutocompletion: true,
@@ -52,104 +50,34 @@ const modalDisplay = document.getElementById("modal-display");
 const themeSelect = document.getElementById("theme-select");
 const reloadSyncIcon = document.getElementById("reload-sync-icon");
 const functionList = document.getElementById("col-button");
+const authStatus = document.getElementById("authStatus");
+const authEmailInput = document.getElementById("authEmail");
+const authPasswordInput = document.getElementById("authPassword");
+const loginButton = document.getElementById("loginButton");
+const registerButton = document.getElementById("registerButton");
+const logoutButton = document.getElementById("logoutButton");
 
 let changesDone = false;
 let autoRun = readBoolean(STORAGE_KEYS.autoRun, true);
 let autoSave = readBoolean(STORAGE_KEYS.autoSave, true);
 let currentExecutionId = 0;
+let isHydratingEditor = false;
+let currentUser = null;
+let currentFunctionId = null;
+let functionRecords = [];
 
 function readBoolean(key, fallback) {
   const value = localStorage.getItem(key);
-  return value === null ? fallback : JSON.parse(value);
+  if (value === null) return fallback;
+  try {
+    return JSON.parse(value);
+  } catch {
+    return fallback;
+  }
 }
 
 function starterTemplate() {
   return `async function main() {\n  return {\n    message: \"Hello from Function Reactor\",\n    now: new Date().toISOString(),\n  };\n}\n\nmain();`;
-}
-
-function getFunctionKeys() {
-  return Object.keys(localStorage)
-    .filter((key) => /^func-\d+$/.test(key))
-    .sort((a, b) => Number(a.split("-")[1]) - Number(b.split("-")[1]));
-}
-
-function getFunctionLabel(key) {
-  return localStorage.getItem(`${key}-name`) || "Untitled Function";
-}
-
-function getCurrentFunction() {
-  return localStorage.getItem(STORAGE_KEYS.currentFunction);
-}
-
-function setCurrentFunction(id) {
-  localStorage.setItem(STORAGE_KEYS.currentFunction, id);
-}
-
-function syncToggleInputs() {
-  autoRunCheckbox.checked = autoRun;
-  autoRunCheckboxModal.checked = autoRun;
-  autoSaveCheckbox.checked = autoSave;
-  autoSaveCheckboxModal.checked = autoSave;
-  reloadSyncIcon.style.display = autoSave ? "inline-flex" : "none";
-}
-
-function ensureAtLeastOneFunction() {
-  if (getFunctionKeys().length > 0) return;
-  const id = "func-1";
-  localStorage.setItem(id, starterTemplate());
-  localStorage.setItem(`${id}-name`, "Getting Started");
-  setCurrentFunction(id);
-}
-
-function renderFunctionList(filterText = "") {
-  const current = getCurrentFunction();
-  const normalized = filterText.trim().toLowerCase();
-  functionList.innerHTML = "";
-
-  const matchingKeys = getFunctionKeys().filter((key) => {
-    if (!normalized) return true;
-    return getFunctionLabel(key).toLowerCase().includes(normalized);
-  });
-
-  if (matchingKeys.length === 0) {
-    const emptyState = document.createElement("div");
-    emptyState.className = "muted-text";
-    emptyState.textContent = "No matching functions.";
-    functionList.appendChild(emptyState);
-    return;
-  }
-
-  matchingKeys.forEach((key) => {
-    const button = document.createElement("button");
-    button.className = `function-item${key === current ? " active" : ""}`;
-    button.id = key;
-    button.innerHTML = `<strong>${escapeHtml(getFunctionLabel(key))}</strong><small>${key}</small>`;
-    button.addEventListener("click", () => clickButtonEvent(key));
-    functionList.appendChild(button);
-  });
-}
-
-async function clickButtonEvent(id) {
-  if (changesDone) {
-    const proceed = confirm("You have unsaved changes. Continue without saving?");
-    if (!proceed) return;
-  }
-
-  setCurrentFunction(id);
-  editor.setValue(localStorage.getItem(id) || "", -1);
-  saveInput.value = getFunctionLabel(id);
-  renderFunctionList(functionSearchInput.value);
-  ChangesDoneFunction(false);
-  await loadTextArea();
-}
-
-function updateEditorStatus(message) {
-  editorStatus.textContent = message;
-}
-
-function setExecutionState(label, variant = "") {
-  executionStatus.textContent = label;
-  executionStatus.className = `status-pill${variant ? ` ${variant}` : ""}`;
 }
 
 function escapeHtml(value) {
@@ -161,6 +89,15 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
+function updateEditorStatus(message) {
+  editorStatus.textContent = message;
+}
+
+function setExecutionState(label, variant = "") {
+  executionStatus.textContent = label;
+  executionStatus.className = `status-pill${variant ? ` ${variant}` : ""}`;
+}
+
 function formatResult(value) {
   if (value === undefined) return "undefined";
   if (typeof value === "string") return value;
@@ -168,14 +105,14 @@ function formatResult(value) {
   if (value instanceof Error) return `${value.name}: ${value.message}`;
   try {
     return JSON.stringify(value, null, 2);
-  } catch (error) {
+  } catch {
     return String(value);
   }
 }
 
 async function runUserCode(rawValue) {
   const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
-  const wrappedCode = `"use strict";\n${rawValue}\n\nif (typeof main === "function") {\n  return await main();\n}`;
+  const wrappedCode = `"use strict";\n${rawValue}\n\nif (typeof main === \"function\") {\n  return await main();\n}`;
   return new AsyncFunction(wrappedCode)();
 }
 
@@ -210,56 +147,184 @@ async function loadTextArea() {
   await setValue(value);
 }
 
-const saveDebounce = debounce(() => {
-  saveButtonFunction(false);
-  spinReloadIcon(1200);
-}, 500);
+async function apiRequest(path, options = {}) {
+  const response = await fetch(path, {
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/json",
+      ...(options.headers || {}),
+    },
+    ...options,
+  });
 
-function saveButtonFunction(showStatus = true) {
-  const currentFunction = getCurrentFunction();
-  if (!currentFunction) return;
+  if (response.status === 204) return null;
 
-  const value = editor.getSession().getValue();
-  localStorage.setItem(currentFunction, value);
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(payload.error || "Request failed");
+  }
 
-  const input = saveInput.value.trim();
-  localStorage.setItem(`${currentFunction}-name`, input || "Untitled Function");
+  return payload;
+}
+
+function getCurrentRecord() {
+  return functionRecords.find((item) => String(item.id) === String(currentFunctionId)) || null;
+}
+
+function syncToggleInputs() {
+  autoRunCheckbox.checked = autoRun;
+  autoRunCheckboxModal.checked = autoRun;
+  autoSaveCheckbox.checked = autoSave;
+  autoSaveCheckboxModal.checked = autoSave;
+  reloadSyncIcon.style.display = autoSave ? "inline-flex" : "none";
+}
+
+function setWorkspaceEnabled(enabled) {
+  createNewButton.disabled = !enabled;
+  saveButton.disabled = !enabled;
+  deleteButton.disabled = !enabled;
+  saveInput.disabled = !enabled;
+  functionSearchInput.disabled = !enabled;
+}
+
+function renderFunctionList(filterText = "") {
+  const normalized = filterText.trim().toLowerCase();
+  functionList.innerHTML = "";
+
+  if (!currentUser) {
+    const emptyState = document.createElement("div");
+    emptyState.className = "muted-text";
+    emptyState.textContent = "Login to access saved functions.";
+    functionList.appendChild(emptyState);
+    return;
+  }
+
+  const matching = functionRecords.filter((item) => {
+    if (!normalized) return true;
+    return item.name.toLowerCase().includes(normalized);
+  });
+
+  if (matching.length === 0) {
+    const emptyState = document.createElement("div");
+    emptyState.className = "muted-text";
+    emptyState.textContent = "No matching functions.";
+    functionList.appendChild(emptyState);
+    return;
+  }
+
+  matching.forEach((item) => {
+    const button = document.createElement("button");
+    button.className = `function-item${String(item.id) === String(currentFunctionId) ? " active" : ""}`;
+    button.id = `func-${item.id}`;
+    button.innerHTML = `<strong>${escapeHtml(item.name)}</strong><small>func-${item.id}</small>`;
+    button.addEventListener("click", () => clickButtonEvent(item.id));
+    functionList.appendChild(button);
+  });
+}
+
+async function clickButtonEvent(id) {
+  if (changesDone) {
+    const proceed = confirm("You have unsaved changes. Continue without saving?");
+    if (!proceed) return;
+  }
+
+  currentFunctionId = String(id);
+  const item = getCurrentRecord();
+  if (!item) return;
+
+  isHydratingEditor = true;
+  editor.setValue(item.code || "", -1);
+  isHydratingEditor = false;
+
+  saveInput.value = item.name;
+  renderFunctionList(functionSearchInput.value);
+  ChangesDoneFunction(false);
+  await loadTextArea();
+}
+
+async function fetchFunctions() {
+  const payload = await apiRequest("/api/functions", { method: "GET" });
+  functionRecords = payload.functions || [];
+}
+
+async function createFunctionOnServer(name, code) {
+  const payload = await apiRequest("/api/functions", {
+    method: "POST",
+    body: JSON.stringify({ name, code }),
+  });
+  return payload.function;
+}
+
+async function ensureAtLeastOneFunction() {
+  if (!currentUser) return;
+  if (functionRecords.length > 0) return;
+  const created = await createFunctionOnServer("Getting Started", starterTemplate());
+  functionRecords = [created];
+}
+
+async function saveButtonFunction(showStatus = true) {
+  if (!currentUser || !currentFunctionId) return;
+
+  const name = saveInput.value.trim() || "Untitled Function";
+  const code = editor.getSession().getValue();
+
+  const payload = await apiRequest(`/api/functions/${currentFunctionId}`, {
+    method: "PUT",
+    body: JSON.stringify({ name, code }),
+  });
+
+  const updated = payload.function;
+  functionRecords = functionRecords.map((item) => (String(item.id) === String(updated.id) ? updated : item));
   renderFunctionList(functionSearchInput.value);
   ChangesDoneFunction(false);
   if (showStatus) updateEditorStatus(`Saved at ${new Date().toLocaleTimeString()}`);
 }
 
-function createNewFunction() {
-  const nextId = `func-${getLastNumberFromLocalStorage()}`;
-  localStorage.setItem(nextId, starterTemplate());
-  localStorage.setItem(`${nextId}-name`, `Function ${getLastNumberFromLocalStorage()}`);
+const saveDebounce = debounce(async () => {
+  try {
+    await saveButtonFunction(false);
+    spinReloadIcon(1200);
+  } catch (error) {
+    updateEditorStatus(error.message);
+  }
+}, 500);
+
+async function createNewFunction() {
+  if (!currentUser) return;
+  const created = await createFunctionOnServer(`Function ${functionRecords.length + 1}`, starterTemplate());
+  functionRecords.unshift(created);
+  currentFunctionId = String(created.id);
   renderFunctionList(functionSearchInput.value);
-  clickButtonEvent(nextId);
+  await clickButtonEvent(created.id);
   updateEditorStatus("Created a new function");
 }
 
-function getLastNumberFromLocalStorage() {
-  const keys = getFunctionKeys();
-  if (keys.length === 0) return 1;
-  return Number(keys[keys.length - 1].split("-")[1]) + 1;
+async function deleteCurrentFunction() {
+  if (!currentUser || !currentFunctionId) return;
+
+  const current = getCurrentRecord();
+  if (!current) return;
+
+  const confirmed = confirm(`Delete \"${current.name}\"?`);
+  if (!confirmed) return;
+
+  await apiRequest(`/api/functions/${currentFunctionId}`, { method: "DELETE" });
+  functionRecords = functionRecords.filter((item) => String(item.id) !== String(currentFunctionId));
+
+  if (functionRecords.length === 0) {
+    const created = await createFunctionOnServer("Getting Started", starterTemplate());
+    functionRecords = [created];
+  }
+
+  currentFunctionId = String(functionRecords[0].id);
+  renderFunctionList(functionSearchInput.value);
+  await clickButtonEvent(currentFunctionId);
+  updateEditorStatus("Function deleted");
 }
 
 function prepareDeleteButton() {
   deleteButton.addEventListener("click", () => {
-    const currentFunction = getCurrentFunction();
-    if (!currentFunction) return;
-
-    const confirmed = confirm(`Delete \"${getFunctionLabel(currentFunction)}\"?`);
-    if (!confirmed) return;
-
-    localStorage.removeItem(currentFunction);
-    localStorage.removeItem(`${currentFunction}-name`);
-    ensureAtLeastOneFunction();
-    const firstKey = getFunctionKeys()[0];
-    setCurrentFunction(firstKey);
-    renderFunctionList(functionSearchInput.value);
-    clickButtonEvent(firstKey);
-    updateEditorStatus("Function deleted");
+    deleteCurrentFunction().catch((error) => updateEditorStatus(error.message));
   });
 }
 
@@ -276,14 +341,11 @@ function prepareCopyButton() {
 
 function prepareEditorChangeHandling() {
   editor.session.on("change", async () => {
+    if (isHydratingEditor || !currentUser) return;
     ChangesDoneFunction(true);
     updateEditorStatus("Unsaved changes");
-    if (autoRun) {
-      await loadTextArea();
-    }
-    if (autoSave) {
-      saveDebounce();
-    }
+    if (autoRun) await loadTextArea();
+    if (autoSave) saveDebounce();
   });
 }
 
@@ -325,12 +387,11 @@ async function searchScript(searchInput = "") {
       const scriptsMap = JSON.parse(localStorage.getItem(STORAGE_KEYS.scripts) || "{}");
       if (!scriptsMap[lib.name]) {
         scriptsMap[lib.name] = lib.latest;
-        appendScript(lib.name, lib.latest);
       } else {
         delete scriptsMap[lib.name];
-        document.getElementById(lib.name)?.remove();
       }
       localStorage.setItem(STORAGE_KEYS.scripts, JSON.stringify(scriptsMap));
+      loadScriptFromLocalStorage();
       searchScript(scriptSearchInput.value);
     });
 
@@ -346,10 +407,16 @@ function appendScript(id, src) {
   const script = document.createElement("script");
   script.src = src;
   script.id = id;
+  script.dataset.userScript = "true";
   document.head.appendChild(script);
 }
 
+function clearManagedScripts() {
+  document.querySelectorAll("script[data-user-script='true']").forEach((script) => script.remove());
+}
+
 function loadScriptFromLocalStorage() {
+  clearManagedScripts();
   const scripts = JSON.parse(localStorage.getItem(STORAGE_KEYS.scripts) || "{}");
   Object.entries(scripts).forEach(([key, value]) => appendScript(key, value));
 }
@@ -434,7 +501,11 @@ function populateThemes() {
     option.textContent = theme;
     themeSelect.appendChild(option);
   });
-  themeSelect.value = localStorage.getItem(STORAGE_KEYS.theme) || "dracula";
+
+  const selectedTheme = localStorage.getItem(STORAGE_KEYS.theme) || "dracula";
+  themeSelect.value = selectedTheme;
+  editor.setTheme(`ace/theme/${selectedTheme}`);
+
   themeSelect.addEventListener("change", (e) => {
     editor.setTheme(`ace/theme/${e.target.value}`);
     localStorage.setItem(STORAGE_KEYS.theme, e.target.value);
@@ -446,16 +517,137 @@ function spinReloadIcon(ms) {
   setTimeout(() => reloadSyncIcon.classList.remove("spin"), ms);
 }
 
+function updateAuthUI() {
+  if (currentUser) {
+    authStatus.textContent = `Logged in as ${currentUser.email}`;
+    authEmailInput.disabled = true;
+    authPasswordInput.disabled = true;
+    loginButton.style.display = "none";
+    registerButton.style.display = "none";
+    logoutButton.style.display = "inline-flex";
+  } else {
+    authStatus.textContent = "Not logged in";
+    authEmailInput.disabled = false;
+    authPasswordInput.disabled = false;
+    loginButton.style.display = "inline-flex";
+    registerButton.style.display = "inline-flex";
+    logoutButton.style.display = "none";
+  }
+}
+
+async function refreshWorkspace() {
+  if (!currentUser) {
+    functionRecords = [];
+    currentFunctionId = null;
+    renderFunctionList(functionSearchInput.value);
+    setWorkspaceEnabled(false);
+    saveInput.value = "";
+    isHydratingEditor = true;
+    editor.setValue(starterTemplate(), -1);
+    isHydratingEditor = false;
+    ChangesDoneFunction(false);
+    updateEditorStatus("Login to create and save persistent functions");
+    await loadTextArea();
+    return;
+  }
+
+  setWorkspaceEnabled(true);
+  await fetchFunctions();
+  await ensureAtLeastOneFunction();
+
+  if (!functionRecords.some((item) => String(item.id) === String(currentFunctionId))) {
+    currentFunctionId = String(functionRecords[0].id);
+  }
+
+  renderFunctionList(functionSearchInput.value);
+
+  const current = getCurrentRecord();
+  if (current) {
+    isHydratingEditor = true;
+    editor.setValue(current.code || "", -1);
+    isHydratingEditor = false;
+    saveInput.value = current.name;
+  }
+
+  ChangesDoneFunction(false);
+  await loadTextArea();
+  updateEditorStatus("Ready");
+}
+
+async function authenticate(mode) {
+  const email = authEmailInput.value.trim();
+  const password = authPasswordInput.value;
+
+  if (!email || !password) {
+    updateEditorStatus("Email and password are required");
+    return;
+  }
+
+  const endpoint = mode === "register" ? "/api/auth/register" : "/api/auth/login";
+  const payload = await apiRequest(endpoint, {
+    method: "POST",
+    body: JSON.stringify({ email, password }),
+  });
+
+  currentUser = payload.user;
+  authPasswordInput.value = "";
+  updateAuthUI();
+  await refreshWorkspace();
+}
+
+async function loadCurrentUser() {
+  const payload = await apiRequest("/api/auth/me", { method: "GET" });
+  currentUser = payload.user;
+  updateAuthUI();
+}
+
+function prepareAuth() {
+  loginButton.addEventListener("click", async () => {
+    try {
+      await authenticate("login");
+      updateEditorStatus("Logged in");
+    } catch (error) {
+      updateEditorStatus(error.message);
+    }
+  });
+
+  registerButton.addEventListener("click", async () => {
+    try {
+      await authenticate("register");
+      updateEditorStatus("Account created");
+    } catch (error) {
+      updateEditorStatus(error.message);
+    }
+  });
+
+  logoutButton.addEventListener("click", async () => {
+    try {
+      await apiRequest("/api/auth/logout", { method: "POST" });
+      currentUser = null;
+      updateAuthUI();
+      await refreshWorkspace();
+      updateEditorStatus("Logged out");
+    } catch (error) {
+      updateEditorStatus(error.message);
+    }
+  });
+}
+
 function prepareButtons() {
-  createNewButton.addEventListener("click", createNewFunction);
-  saveButton.addEventListener("click", () => saveButtonFunction(true));
+  createNewButton.addEventListener("click", () => {
+    createNewFunction().catch((error) => updateEditorStatus(error.message));
+  });
+
+  saveButton.addEventListener("click", () => {
+    saveButtonFunction(true).catch((error) => updateEditorStatus(error.message));
+  });
+
   runButton.addEventListener("click", loadTextArea);
   functionSearchInput.addEventListener("input", functionFilterDebounce);
 }
 
 async function initializeApp() {
   loadScriptFromLocalStorage();
-  ensureAtLeastOneFunction();
   populateThemes();
   syncToggleInputs();
   prepareButtons();
@@ -465,19 +657,20 @@ async function initializeApp() {
   setupAutoRunCheckbox();
   setupAutoSaveCheckbox();
   setupModal();
+  prepareAuth();
 
   Array.from(modalDisplay.children).forEach((section, index) => {
     section.style.display = index === 0 ? "block" : "none";
   });
 
-  const currentFunction = getCurrentFunction() || getFunctionKeys()[0];
-  setCurrentFunction(currentFunction);
-  renderFunctionList();
-  editor.setValue(localStorage.getItem(currentFunction) || starterTemplate(), -1);
-  saveInput.value = getFunctionLabel(currentFunction);
-  ChangesDoneFunction(false);
-  await loadTextArea();
-  updateEditorStatus("Ready");
+  try {
+    await loadCurrentUser();
+  } catch {
+    currentUser = null;
+    updateAuthUI();
+  }
+
+  await refreshWorkspace();
 }
 
 initializeApp();

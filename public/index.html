@@ -32,6 +32,23 @@
           </button>
         </div>
 
+        <div class="auth-panel">
+          <p class="muted-text" id="authStatus">Not logged in</p>
+          <label class="auth-field">
+            <span>Email</span>
+            <input type="email" id="authEmail" placeholder="you@example.com" autocomplete="email" />
+          </label>
+          <label class="auth-field">
+            <span>Password</span>
+            <input type="password" id="authPassword" placeholder="At least 8 characters" autocomplete="current-password" />
+          </label>
+          <div class="auth-actions">
+            <button class="button secondary" id="loginButton">Login</button>
+            <button class="button secondary" id="registerButton">Register</button>
+            <button class="button danger" id="logoutButton" style="display: none">Logout</button>
+          </div>
+        </div>
+
         <label class="search-field">
           <span class="material-symbols-outlined">search</span>
           <input type="text" id="functionSearchInput" placeholder="Search functions" />

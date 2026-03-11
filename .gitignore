@@ -1,3 +1,4 @@
 node_modules
 deploy.md
 settings.json
+data/store.json

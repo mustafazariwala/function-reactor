@@ -127,6 +127,44 @@ h2 {
   padding-left: 0;
 }
 
+.auth-panel {
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(15, 23, 42, 0.68);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.auth-panel .muted-text {
+  margin: 0;
+}
+
+.auth-field {
+  display: grid;
+  gap: 6px;
+}
+
+.auth-field span {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.auth-field input {
+  padding: 9px 10px;
+  border-radius: 12px;
+}
+
+.auth-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.auth-actions .button {
+  padding: 8px 12px;
+}
+
 .sidebar-toggles {
   display: grid;
   gap: 12px;
